@@ -7,12 +7,14 @@ setwd(project_path)
 
 # 设置项目
 item <- "chol"
+item_path <- paste(project_path,"/datasets/",item,sep="")
+
 ######表达矩阵批量读入与合并######
 # 先读入两个tsv检查gene_id和gene_name在不同样本中是否仍是一致的:
 tsv1 <- "/0c9aba87-406f-4789-9275-e1d25bb3aea7/72fffe3e-d4fb-4862-ba01-e91289ed94ef.rna_seq.augmented_star_gene_counts.tsv"
 tsv2 <- "/0e0dcae8-4cc2-4ba5-bc0d-07c9dbd0e5a2/d94cd170-9dff-4b44-a7a8-6d1c277b0f8b.rna_seq.augmented_star_gene_counts.tsv"
-file1 <- paste(project_path,"/datasets/",item,tsv1,sep="")
-file2 <- paste(project_path,"/datasets/",item,tsv2,sep="")
+file1 <- paste(item_path,tsv1,sep="")
+file2 <- paste(item_path,tsv2,sep="")
 if(!file.exists(file1)){
   stop("file1不存在")
 }
@@ -36,3 +38,10 @@ if(!gene_name_res){
 ## 注意，data.table::fread方式读入文件并不能指定行名，所以才使用这种方法
 x1 <- data.table::fread(file1,select = c("gene_id"))
 head(x1)
+
+# 批量读取所有tsv格式后缀文件的文件名：
+# *表示任意前缀，$表示固定后缀
+file_list <- dir(item_path,
+               pattern = "*.rna_seq.augmented_star_gene_counts.tsv$",
+               recursive = T)
+head(file_list)
