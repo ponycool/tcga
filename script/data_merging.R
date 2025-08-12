@@ -45,3 +45,15 @@ file_list <- dir(item_path,
                pattern = "*.rna_seq.augmented_star_gene_counts.tsv$",
                recursive = T)
 head(file_list)
+
+# 创建自定义函数,用于批量读入所有tsv文件的unstranded列（counts）：
+exp_dt <- function(x){
+  result <- data.table::fread(file.path(item_path,x),
+                              select = c("unstranded"))
+  return(result)
+}
+# 读取所有.tsv的unstranded列（将file_list转换为list，并对list中的每一个元素都应用函数exp_dt）
+exp <- lapply(file_list,exp_dt)
+# 将exp按列合并，并将list转化为data.table
+exp <- do.call(cbind,exp)
+exp[1:6,1:6]
