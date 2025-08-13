@@ -9,6 +9,7 @@ setwd(project_path)
 item <- "chol"
 item_path <- paste(project_path,"/datasets/",item,sep="")
 
+json_path <- paste(project_path,'/json/',item,sep="")
 ######表达矩阵批量读入与合并######
 # 先读入两个tsv检查gene_id和gene_name在不同样本中是否仍是一致的:
 tsv1 <- "/0c9aba87-406f-4789-9275-e1d25bb3aea7/72fffe3e-d4fb-4862-ba01-e91289ed94ef.rna_seq.augmented_star_gene_counts.tsv"
@@ -57,3 +58,19 @@ exp <- lapply(file_list,exp_dt)
 # 将exp按列合并，并将list转化为data.table
 exp <- do.call(cbind,exp)
 exp[1:6,1:6]
+
+# 添加行名(gene_id),所有表达矩阵的gene_id是相同的：
+# data.table格式不能自定行名，因此我们先转换为数据框
+exp <- as.data.frame(exp)
+rownames(exp) <- x1$gene_id
+exp[1:8,1:4]
+
+# 列名替换为样本名
+# 读取json文件（读取函数fromJSON来自R自带R包jsonlite）：
+json_file <- paste(json_path,"/metadata.cart.2025-08-13.json",sep="")
+if(!file.exists(json_file)){
+  stop("JSON文件不存在")
+}
+meta_dt <- jsonlite::fromJSON(json_file)
+# 查看这个list中第三列中的第一个list(包含数据框):
+meta_dt[[3]][[1]]
