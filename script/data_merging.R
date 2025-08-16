@@ -74,3 +74,10 @@ if(!file.exists(json_file)){
 meta_dt <- jsonlite::fromJSON(json_file)
 # 查看这个list中第三列中的第一个list(包含数据框):
 meta_dt[[3]][[1]]
+
+id <- meta_dt$associated_entities
+id[[1]]
+# 这是我们需要的样本
+id[[1]][,1]
+# 这是我们需要用来匹配的文件名
+head(meta_dt[[4]])
