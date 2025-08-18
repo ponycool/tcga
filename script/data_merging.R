@@ -81,3 +81,49 @@ id[[1]]
 id[[1]][,1]
 # 这是我们需要用来匹配的文件名
 head(meta_dt[[4]])
+
+# 读取所有样本id，返回一个包含所有id名的向量（和前面lapply的区别，lapply返回的是list）
+ids <- sapply(id,function(x){x[,1]}) 
+# 生成一个包含有样本id和文件名这两列对应关系的数据框，文件名即为表达矩阵的文件名
+ids2 <- data.frame(file_name = meta_dt$file_name,
+                   id = ids) 
+head(ids2)
+
+# 观察文件名结构：
+ids2$file_name[1:2]
+head(file_list)[1:2]
+
+# 用"/"做一个字符串拆分：把表达矩阵的文件名(file_list)的后半段和file_name做匹配：
+library(stringr)
+# 以/做拆分，simplify = T把结果返回成矩阵
+file_list_dt <- str_split(file_list,"/",simplify = T)
+head(file_list_dt)
+
+# 取矩阵第二列：
+file_list_dt <- file_list_dt[,2]
+# 用百分百in检测是否拆分后的文件名都完全包含在file_name中(此时顺序不同，因此不能用==)
+# 全部返回TRUE，则拆分无误
+res <- file_list_dt %in% ids2$file_name
+if(all(res)){
+  message("SUCCESS 文件名全部包含在ids的filename列中")
+}else{
+  stop("FAILED 文件名未全部包含在ids的filename列中")
+}
+
+# 用match函数调整file_name的顺序和file_list_dt一致（因为我们合并的表达矩阵是按照file_list_dt的顺序进行合并的）
+ids3 <- ids2[match(file_list_dt,ids2$file_name),]
+# 查看并检查顺序：
+head(ids3$file_name)
+head(file_list_dt)
+res <- identical(ids3$file_name,file_list_dt)
+# 返回TRUE，确认无误
+if(isTRUE(res)){
+  message('SUCCESS 检查通过')
+}else{
+  stop("FAILED 检查未通过")
+}
+
+# 修改列名为样本名：
+colnames(exp) <- ids3$id
+exp[1:8,1:2]
+message("表达矩阵合并完成！")
