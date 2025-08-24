@@ -187,5 +187,25 @@ lncRNA_exp2 <- lncRNA_exp2[,-2]
 
 
 # 两种方法结果一致
-identical(mRNA_exp,mRNA_exp2)
+res <- identical(mRNA_exp,mRNA_exp2)
+if(!isTRUE(res)){
+  stop("mRNA 方法一和方法二结果不一致")
+}
 identical(lncRNA_exp,lncRNA_exp2)
+if(!isTRUE(res)){
+  stop("lncRNA 方法一和方法二结果不一致")
+}
+
+# 保存数据
+data_path <- paste(project_path,"/data/",item,"/",item,".Rdata",sep = "")
+save(
+  # 做完合并的表达矩阵
+  exp,
+  # 添加gene_name列的表达矩阵
+  exp2,
+  # mRNA的表达矩阵
+  mRNA_exp,
+  #lncRNA的表达矩阵
+  lncRNA_exp,
+  file = c(data_path)
+)
