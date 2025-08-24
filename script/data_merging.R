@@ -127,3 +127,65 @@ if(isTRUE(res)){
 colnames(exp) <- ids3$id
 exp[1:8,1:2]
 message("表达矩阵合并完成！")
+
+## 随便选一个tsv取gene_name这一列（这里记得转换为数据框，不然后面合并会丢失exp的行名）：
+list <- as.data.frame(data.table::fread(file1,
+                                        select = c("gene_name")))
+exp2 <- cbind(list,exp)
+#包含gene_name列的矩阵完成
+exp2[1:10,1:3]
+
+
+################# 方法一：
+# 不需要区分九种不同的lncRNA了
+lncRNA <- c("lncRNA")
+mRNA <- c("protein_coding")
+
+list2 <- as.data.frame(data.table::fread(file1,
+                                         select = c("gene_id","gene_name","gene_type")))
+lncRNA_list <- list2[list2$gene_type %in% lncRNA,]
+mRNA_list <- list2[list2$gene_type %in% mRNA,]
+
+# 现16901个，更新前14826个
+length(lncRNA_list$gene_id)
+# 现19962个，更新前19814个
+length(mRNA_list$gene_id)
+
+# v33版的GENECODE比v22版鉴定到的mRNA和lncRNA数量都更多了。
+
+# 分别取表达矩阵(exp2)和mRNA/lncRNA_list的gene_id交集：
+# mRNA交集：
+mRNA_int <- intersect(
+  rownames(exp2),
+  mRNA_list$gene_id
+)
+# lncRNA交集：
+lncRNA_int <- intersect(
+  rownames(exp2),
+  lncRNA_list$gene_id
+)
+
+mRNA_exp <- exp2[mRNA_int,]
+lncRNA_exp <- exp2[lncRNA_int,]
+###### 方法一结束
+
+############# 方法二(直接用%in%判断并筛选即可)：
+# 这个方法就是我们先把表达矩阵和gene-name、gene_type三者合并，通过gene_type筛选，最后把不需要的列去掉。
+list22 <- as.data.frame(data.table::fread(file1,
+                                          select = c("gene_name","gene_type")))
+# 把gene_type列合并进来
+exp3 <- cbind(list22,exp)
+exp3[1:8,1:3]
+
+# 下面直接筛选即可：
+mRNA_exp2 <- exp3[exp3$gene_type %in% c("protein_coding"),]
+lncRNA_exp2 <- exp3[exp3$gene_type %in% c("lncRNA"),]
+
+# 最后去掉用于筛选的gene_type这一列：
+mRNA_exp2 <- mRNA_exp2[,-2]
+lncRNA_exp2 <- lncRNA_exp2[,-2]
+
+
+# 两种方法结果一致
+identical(mRNA_exp,mRNA_exp2)
+identical(lncRNA_exp,lncRNA_exp2)
