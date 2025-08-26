@@ -1,93 +1,69 @@
-# TGGA
+# TCGA数据处理工具
 
+## 项目简介
+本项目旨在简化TCGA(The Cancer Genome Atlas)数据的下载与基因表达矩阵的合成流程，为生物信息学研究人员提供高效、可重复的数据预处理解决方案。通过自动化脚本实现从数据下载到矩阵合成的完整工作流，减少手动操作错误，提高研究效率。
 
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+## 目录结构
 ```
-cd existing_repo
-git remote add origin https://git.ponycool.com/ponycool/bioinformatics/tgga.git
-git branch -M main
-git push -uf origin main
+TCGA/
+├── GDC Data Transfer Tool/  # 存放GDC官方数据传输工具
+├── data/                    # 保存处理后的基因表达矩阵等结果数据
+├── datasets/                # 存储从TCGA下载的原始样本数据
+├── json/                    # 保存数据下载相关的JSON元数据文件
+├── script/                  # 包含数据处理的R语言脚本
+└── README.md                # 项目说明文档
 ```
 
-## Integrate with your tools
+## 安装说明
 
-- [ ] [Set up project integrations](http://git.ponycool.com/ponycool/bioinformatics/tgga/-/settings/integrations)
+### 前提条件
+- R (>= 4.0)
+- GDC Data Transfer Tool
 
-## Collaborate with your team
+### 项目获取
+```bash
+git clone https://github.com/ponycool/tcga.git
+cd tcga
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### 依赖安装
+在R环境中安装必要的依赖包：
+```r
+install.packages(c("stringr", "jsonlite", "dplyr", "SummarizedExperiment"))
+```
 
-## Test and Deploy
+## 使用指南
 
-Use the built-in continuous integration in GitLab.
+### 1. 数据下载
+#### 准备manifest文件
+1. 登录[GDC Data Portal](https://portal.gdc.cancer.gov/)
+2. 选择感兴趣的数据集，生成manifest文件
+3. 将manifest文件保存到`json/`目录
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+#### 执行数据下载
+```bash
+# 使用GDC Data Transfer Tool下载数据
+./GDC\ Data\ Transfer\ Tool/gdc-client download -m json/manifest.txt -d datasets/
+```
 
-***
+### 2. 基因表达矩阵合成
+运行R脚本处理下载的数据并生成基因表达矩阵：
+```bash
+Rscript script/data_mergin.R
+```
 
-# Editing this README
+## 脚本说明
+- `data_mergin.R`: 实现数据解析、标准化和矩阵合成功能
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## 贡献指南
+1. Fork本仓库
+2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 打开Pull Request
 
-## Suggestions for a good README
+## 许可证
+本项目采用MIT许可证 - 详见[LICENSE](LICENSE)文件
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## 致谢
+- [TCGA](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga)项目提供数据支持
