@@ -1,5 +1,5 @@
 # 设置项目目录
-project_path <- "D:/Dev/projects/tgga"
+project_path <- "D:/Dev/projects/tcga"
 if(!dir.exists(project_path)){
   stop("工作目录不存在")
 }
