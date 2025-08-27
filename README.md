@@ -29,7 +29,7 @@ cd tcga
 ### 依赖安装
 在R环境中安装必要的依赖包：
 ```r
-install.packages(c("stringr", "jsonlite", "dplyr", "SummarizedExperiment"))
+install.packages(c("data.table", "jsonlite", "stringr"))
 ```
 
 ## 使用指南
